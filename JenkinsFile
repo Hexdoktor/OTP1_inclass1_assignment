@@ -33,8 +33,8 @@ jacoco()
 }
 stage('Docker Build') {
     steps {
-        bat 'docker build -t hexdoktor/temperature-converter:%BUILD_NUMBER% .'
-        bat 'docker tag hexdoktor/temperature-converter:%BUILD_NUMBER% hexdoktor/temperature-converter:latest'
+        bat 'docker build -t hexdoktor/temp_converter_docker:%BUILD_NUMBER% .'
+        bat 'docker tag hexdoktor/temp_converter_docker:%BUILD_NUMBER% hexdoktor/temp_converter_docker:latest'
     }
 }
 
@@ -42,8 +42,8 @@ stage('Docker Push') {
     steps {
         withCredentials([usernamePassword(credentialsId: 'docker-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
             bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-            bat 'docker push hexdoktor/temperature-converter:%BUILD_NUMBER%'
-            bat 'docker push hexdoktor/temperature-converter:latest'
+            bat 'docker push hexdoktor/temp_converter_docker:%BUILD_NUMBER%'
+            bat 'docker push hexdoktor/temp_converter_docker:latest'
         }
     }
 }
