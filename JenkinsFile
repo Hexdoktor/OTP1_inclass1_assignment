@@ -44,7 +44,7 @@ pipeline {
                     bat 'echo [%DOCKER_USER%]'
                     bat 'echo %DOCKER_PASS%X'
                     // --- end debug ---
-                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
+                    bat 'echo %DOCKER_PASS%| docker login -u %DOCKER_USER% --password-stdin'
                     bat 'docker push hexdoktor/temp_converter_docker:%BUILD_NUMBER%'
                     bat 'docker push hexdoktor/temp_converter_docker:latest'
                 }
