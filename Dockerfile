@@ -1,4 +1,19 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM maven:3.9.9-eclipse-temurin-21
+
+RUN apt-get update && apt-get install -y \
+    libx11-6 \
+    libgtk-3-0 \
+    libxtst6 \
+    libxi6 \
+    libxrender1 \
+    libxext6 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-COPY target/OTP1_inclass1_assignment_Juuso-1.0-SNAPSHOT.jar app.jar
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+COPY . .
+
+RUN mvn clean package -DskipTests
+
+CMD ["mvn", "javafx:run"]
