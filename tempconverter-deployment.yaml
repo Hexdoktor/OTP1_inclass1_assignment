@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: tempconverter
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: tempconverter
+
+  template:
+    metadata:
+      labels:
+        app: tempconverter
+
+    spec:
+      containers:
+        - name: tempconverter
+          image: hexdoktor/temp_converter_docker:latest
+          imagePullPolicy: Always
