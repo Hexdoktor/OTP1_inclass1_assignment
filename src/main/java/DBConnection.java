@@ -4,7 +4,7 @@ import java.sql.DriverManager;
 public class DBConnection {
 
     private static final String URL =
-            "jdbc:mysql://host.docker.internal:3306/tempconverter";
+            "jdbc:mysql://localhost:3306/tempconverter";
 
     private static final String USER = "root";
 
