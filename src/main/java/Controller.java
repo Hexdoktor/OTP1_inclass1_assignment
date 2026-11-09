@@ -1,9 +1,8 @@
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.geometry.NodeOrientation;
+import javafx.scene.control.*;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
@@ -16,10 +15,10 @@ public class Controller {
     private TextField temperatureField;
 
     @FXML
-    private ComboBox<String> fromUnitBox;
+    private ComboBox<UnitTranslation> fromUnitBox;
 
     @FXML
-    private ComboBox<String> toUnitBox;
+    private ComboBox<UnitTranslation> toUnitBox;
 
     @FXML
     private ComboBox<String> languageBox;
@@ -30,29 +29,22 @@ public class Controller {
     @FXML
     private Label resultLabel;
 
+    @FXML
+    private ListView<String> historyList;
+
     private final TemperatureConverter converter =
             new TemperatureConverter();
 
     private final TemperatureRecordDAO dao =
             new TemperatureRecordDAO();
 
+    private final UnitTranslationDAO unitDao =
+            new UnitTranslationDAO();
+
+    private String currentLanguage = "en";
+
     @FXML
     public void initialize() {
-
-        fromUnitBox.getItems().addAll(
-                "Celsius",
-                "Fahrenheit",
-                "Kelvin"
-        );
-
-        toUnitBox.getItems().addAll(
-                "Celsius",
-                "Fahrenheit",
-                "Kelvin"
-        );
-
-        fromUnitBox.setValue("Celsius");
-        toUnitBox.setValue("Fahrenheit");
 
         languageBox.getItems().addAll(
                 "English",
@@ -68,12 +60,44 @@ public class Controller {
                 e -> changeLanguage()
         );
 
+        loadUnits("en");
+
         updateTexts(
                 ResourceBundle.getBundle(
                         "messages",
                         Locale.ENGLISH
                 )
         );
+
+        loadHistory();
+    }
+
+    private void loadUnits(
+            String language
+    ) {
+
+        List<UnitTranslation> units =
+                unitDao.getUnits(language);
+
+        fromUnitBox.getItems().clear();
+        toUnitBox.getItems().clear();
+
+        fromUnitBox.getItems().addAll(units);
+        toUnitBox.getItems().addAll(units);
+
+        if (!units.isEmpty()) {
+
+            fromUnitBox.setValue(
+                    units.get(0)
+            );
+
+            if (units.size() > 1) {
+
+                toUnitBox.setValue(
+                        units.get(1)
+                );
+            }
+        }
     }
 
     @FXML
@@ -86,68 +110,24 @@ public class Controller {
                             temperatureField.getText()
                     );
 
-            String from =
+            UnitTranslation from =
                     fromUnitBox.getValue();
 
-            String to =
+            UnitTranslation to =
                     toUnitBox.getValue();
 
-            double converted = value;
-
-            if (from.equals("Celsius")
-                    && to.equals("Fahrenheit")) {
-
-                converted =
-                        converter.celsiusToFahrenheit(
-                                value
-                        );
-
-            } else if (from.equals("Fahrenheit")
-                    && to.equals("Celsius")) {
-
-                converted =
-                        converter.fahrenheitToCelsius(
-                                value
-                        );
-
-            } else if (from.equals("Kelvin")
-                    && to.equals("Celsius")) {
-
-                converted =
-                        converter.kelvinToCelsius(
-                                value
-                        );
-
-            } else if (from.equals("Celsius")
-                    && to.equals("Kelvin")) {
-
-                converted =
-                        converter.celsiusToKelvin(
-                                value
-                        );
-
-            } else if (from.equals("Fahrenheit")
-                    && to.equals("Kelvin")) {
-
-                converted =
-                        converter.fahrenheitToKelvin(
-                                value
-                        );
-
-            } else if (from.equals("Kelvin")
-                    && to.equals("Fahrenheit")) {
-
-                converted =
-                        converter.kelvinToFahrenheit(
-                                value
-                        );
-            }
+            double converted =
+                    performConversion(
+                            value,
+                            from.getUnitId(),
+                            to.getUnitId()
+                    );
 
             resultLabel.setText(
                     String.format(
                             "%.2f %s",
                             converted,
-                            getUnitSymbol(to)
+                            to.getName()
                     )
             );
 
@@ -155,9 +135,13 @@ public class Controller {
                     new TemperatureRecord(
                             value,
                             converted,
-                            getUnitId(to)
+                            from.getUnitId(),
+                            to.getUnitId(),
+                            currentLanguage
                     )
             );
+
+            loadHistory();
 
         } catch (NumberFormatException ex) {
 
@@ -168,11 +152,46 @@ public class Controller {
         } catch (Exception ex) {
 
             resultLabel.setText(
-                    "Database error"
+                    "Conversion failed"
             );
 
             ex.printStackTrace();
         }
+    }
+
+    private double performConversion(
+            double value,
+            int fromId,
+            int toId
+    ) {
+
+        if (fromId == toId) {
+            return value;
+        }
+
+        // Celsius = 1
+        // Fahrenheit = 2
+        // Kelvin = 3
+
+        if (fromId == 1 && toId == 2)
+            return converter.celsiusToFahrenheit(value);
+
+        if (fromId == 2 && toId == 1)
+            return converter.fahrenheitToCelsius(value);
+
+        if (fromId == 1 && toId == 3)
+            return converter.celsiusToKelvin(value);
+
+        if (fromId == 3 && toId == 1)
+            return converter.kelvinToCelsius(value);
+
+        if (fromId == 2 && toId == 3)
+            return converter.fahrenheitToKelvin(value);
+
+        if (fromId == 3 && toId == 2)
+            return converter.kelvinToFahrenheit(value);
+
+        return value;
     }
 
     private void changeLanguage() {
@@ -201,6 +220,9 @@ public class Controller {
                 locale = Locale.ENGLISH;
         }
 
+        currentLanguage =
+                locale.getLanguage();
+
         ResourceBundle bundle =
                 ResourceBundle.getBundle(
                         "messages",
@@ -208,6 +230,10 @@ public class Controller {
                 );
 
         updateTexts(bundle);
+
+        loadUnits(currentLanguage);
+
+        updateOrientation(locale);
     }
 
     private void updateTexts(
@@ -227,43 +253,40 @@ public class Controller {
         );
     }
 
-    private String getUnitSymbol(
-            String unit
+    private void updateOrientation(
+            Locale locale
     ) {
 
-        switch (unit) {
+        if (titleLabel.getScene() == null) {
+            return;
+        }
 
-            case "Celsius":
-                return "°C";
+        if ("ar".equals(
+                locale.getLanguage()
+        )) {
 
-            case "Fahrenheit":
-                return "°F";
+            titleLabel.getScene()
+                    .getRoot()
+                    .setNodeOrientation(
+                            NodeOrientation.RIGHT_TO_LEFT
+                    );
+        }
+        else {
 
-            case "Kelvin":
-                return "K";
-
-            default:
-                return "";
+            titleLabel.getScene()
+                    .getRoot()
+                    .setNodeOrientation(
+                            NodeOrientation.LEFT_TO_RIGHT
+                    );
         }
     }
 
-    private int getUnitId(
-            String unit
-    ) {
+    private void loadHistory() {
 
-        switch (unit) {
+        historyList.getItems().clear();
 
-            case "Celsius":
-                return 1;
-
-            case "Fahrenheit":
-                return 2;
-
-            case "Kelvin":
-                return 3;
-
-            default:
-                return 1;
-        }
+        historyList.getItems().addAll(
+                dao.getLastFiveConversions()
+        );
     }
 }

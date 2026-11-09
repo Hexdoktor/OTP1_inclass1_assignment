@@ -5,13 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 class TemperatureRecordTest {
 
     @Test
-    void constructorWorks() {
+    void constructorStoresValues() {
 
         TemperatureRecord record =
                 new TemperatureRecord(
                         100,
                         212,
-                        1
+                        1,
+                        2,
+                        "en"
                 );
 
         assertEquals(
@@ -26,7 +28,17 @@ class TemperatureRecordTest {
 
         assertEquals(
                 1,
-                record.getUnitId()
+                record.getFromUnitId()
+        );
+
+        assertEquals(
+                2,
+                record.getToUnitId()
+        );
+
+        assertEquals(
+                "en",
+                record.getLanguage()
         );
     }
 }

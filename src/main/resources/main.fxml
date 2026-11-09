@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="Controller"
-      spacing="10">
+<VBox
+        xmlns="http://javafx.com/javafx"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="Controller"
+        spacing="10">
 
-    <Label fx:id="titleLabel" />
+    <Label fx:id="titleLabel"/>
 
-    <ComboBox fx:id="languageBox" />
+    <ComboBox fx:id="languageBox"/>
 
-    <TextField fx:id="temperatureField" />
+    <TextField fx:id="temperatureField"/>
 
-    <ComboBox fx:id="fromUnitBox" />
+    <ComboBox fx:id="fromUnitBox"/>
 
-    <ComboBox fx:id="toUnitBox" />
+    <ComboBox fx:id="toUnitBox"/>
 
     <Button
             fx:id="convertButton"
-            onAction="#convert" />
+            onAction="#convert"/>
 
-    <Label fx:id="resultLabel" />
+    <Label fx:id="resultLabel"/>
+
+    <ListView fx:id="historyList"/>
 
 </VBox>

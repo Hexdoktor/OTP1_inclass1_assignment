@@ -74,6 +74,13 @@
 
                 <configuration>
                     <outputDirectory>${project.build.directory}/jacoco</outputDirectory>
+                    <excludes>
+
+                        <exclude>Main</exclude>
+
+                        <exclude>Controller</exclude>
+
+                    </excludes>
                 </configuration>
             </plugin>
 

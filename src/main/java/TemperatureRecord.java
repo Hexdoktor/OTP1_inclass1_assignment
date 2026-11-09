@@ -2,18 +2,23 @@ public class TemperatureRecord {
 
     private double inputValue;
     private double resultValue;
-    private int unitId;
+    private int fromUnitId;
+    private int toUnitId;
+    private String language;
 
     public TemperatureRecord
             (
                     double inputValue,
                     double resultValue,
-                    int unitId
-            ) {
+                    int fromUnitId,
+                    int toUnitId,
+                    String language) {
 
         this.inputValue = inputValue;
         this.resultValue = resultValue;
-        this.unitId = unitId;
+        this.fromUnitId = fromUnitId;
+        this.toUnitId = toUnitId;
+        this.language = language;
     }
 
     public double getInputValue() {
@@ -24,7 +29,12 @@ public class TemperatureRecord {
         return resultValue;
     }
 
-    public int getUnitId() {
-        return unitId;
+    public int getFromUnitId() {
+        return fromUnitId;
+    }
+    public int getToUnitId(){return toUnitId;}
+
+    public String getLanguage(){
+        return language;
     }
 }
